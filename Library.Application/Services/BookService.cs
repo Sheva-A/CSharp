@@ -1,20 +1,26 @@
-using LibraryApi.Data;
-using LibraryApi.Models;
-using LibraryApi.DTOs;
+using AutoMapper;
+using Library.Domain.Models;
+using Library.Application.Interfaces;
+using Library.Infrastructure.Data;
+using Library.Application.DTOs;
 
-namespace LibraryApi.Service;
+namespace Library.Application.Services;
 
 public class BookService : IBookService
 {
     private readonly AppDbContext _context;
-    public BookService(AppDbContext context) { _context = context; }
+    private readonly IMapper _mapper;
+
+    public BookService(AppDbContext context, IMapper mapper) 
+    { 
+        _context = context; 
+        _mapper = mapper;
+    }
 
     public IEnumerable<BookResponseDto> GetAllBooks()
     {
-        return _context.Books.Select(b => new BookResponseDto 
-        { 
-            Id = b.Id, Title = b.Title, Author = b.Author 
-        }).ToList();
+        var books = _context.Books.ToList();
+        return _mapper.Map<IEnumerable<BookResponseDto>>(books);
     }
 
     public BookResponseDto? GetBookById(int id)
@@ -22,16 +28,16 @@ public class BookService : IBookService
         var book = _context.Books.Find(id);
         if (book == null) return null;
 
-        return new BookResponseDto { Id = book.Id, Title = book.Title, Author = book.Author };
+        return _mapper.Map<BookResponseDto>(book);
     }
 
     public BookResponseDto AddBook(BookDto bookDto)
     {
-        var book = new Book { Title = bookDto.Title, Author = bookDto.Author };
+        var book = _mapper.Map<Book>(bookDto);
         _context.Books.Add(book);
         _context.SaveChanges();
 
-        return new BookResponseDto { Id = book.Id, Title = book.Title, Author = book.Author };
+        return _mapper.Map<BookResponseDto>(book);
     }
 
     public bool UpdateBook(int id, BookDto bookDto)
@@ -39,8 +45,8 @@ public class BookService : IBookService
         var book = _context.Books.Find(id);
         if (book == null) return false;
 
-        book.Title = bookDto.Title;
-        book.Author = bookDto.Author;
+        _mapper.Map(bookDto, book);
+        
         _context.SaveChanges();
         return true;
     }

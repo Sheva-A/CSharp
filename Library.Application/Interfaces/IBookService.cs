@@ -1,6 +1,6 @@
-using LibraryApi.DTOs;
+using Library.Application.DTOs;
 
-namespace LibraryApi.Service;
+namespace Library.Application.Interfaces;
 
 public interface IBookService
 {
