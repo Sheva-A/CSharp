@@ -1,6 +1,18 @@
 @LibraryApi_HostAddress = http://localhost:5014
 
-GET {{LibraryApi_HostAddress}}/weatherforecast/
+### 1. Отримати всі книги
+GET {{LibraryApi_HostAddress}}/api/books
 Accept: application/json
 
-###
+### 2. Додати нову книгу
+POST {{LibraryApi_HostAddress}}/api/books
+Content-Type: application/json
+
+{
+  "title": "Kobzar",
+  "author": "Taras Shevchenko"
+}
+
+### 3. Отримати книгу за ID
+GET {{LibraryApi_HostAddress}}/api/books/1
+Accept: application/json
