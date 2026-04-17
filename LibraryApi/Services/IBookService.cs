@@ -1,11 +1,13 @@
-using LibraryApi.Models;
 using LibraryApi.DTOs;
 
 namespace LibraryApi.Service;
 
 public interface IBookService
 {
-    IEnumerable<Book> GetAllBooks();
-    Book? GetBookById(int id);
-    Book AddBook(BookDto bookDto);
+    IEnumerable<BookResponseDto> GetAllBooks();
+    BookResponseDto? GetBookById(int id);
+    BookResponseDto AddBook(BookDto bookDto);
+    bool UpdateBook(int id, BookDto bookDto);
+    bool DeleteBook(int id);
 }
+

@@ -10,35 +10,36 @@ namespace LibraryApi.Controllers;
 public class BooksController : ControllerBase
 {
     private readonly IBookService _bookService;
-
-    public BooksController(IBookService bookService)
-    {
-        _bookService = bookService;
-    }
+    public BooksController(IBookService bookService) { _bookService = bookService; }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Book>> GetAll() 
-    {
-        return Ok(_bookService.GetAllBooks());
-    }
+    public ActionResult<IEnumerable<BookResponseDto>> GetAll() => Ok(_bookService.GetAllBooks());
 
     [HttpGet("{id}")]
-    public ActionResult<Book> GetById(int id)
+    public ActionResult<BookResponseDto> GetById(int id)
     {
         var book = _bookService.GetBookById(id);
-        if (book == null) return NotFound(new { message = $"Книгу з ID {id} не знайдено." });
-        
-        return Ok(book);
+        return book == null ? NotFound(new { message = "Книгу не знайдено" }) : Ok(book);
     }
 
     [HttpPost]
-    public ActionResult<Book> Create([FromBody] BookDto bookDto)
+    public ActionResult<BookResponseDto> Create([FromBody] BookDto bookDto)
     {
-        if (string.IsNullOrWhiteSpace(bookDto.Title)) 
-            return BadRequest(new { error = "Назва книги (Title) є обов'язковою." });
+        var result = _bookService.AddBook(bookDto);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
 
-        var createdBook = _bookService.AddBook(bookDto);
-        
-        return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, [FromBody] BookDto bookDto)
+    {
+        var success = _bookService.UpdateBook(id, bookDto);
+        return success ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var success = _bookService.DeleteBook(id);
+        return success ? NoContent() : NotFound();
     }
 }
